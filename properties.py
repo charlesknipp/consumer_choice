@@ -1,4 +1,4 @@
-from functools import reduce
+import math
 
 '''
 Now I want to find a way of cumputing the fixed point in the findIntersection
@@ -26,7 +26,7 @@ def f(x,theta=p):
 
 def g(x,theta=t):
     items = [x[i]**theta[i] for i in range(len(x))]
-    return reduce(lambda x,y: x*y,items,1)
+    return math.prod(items)
 
 
 # write a function to show IDs holds for a given pair (x_h, x_l)

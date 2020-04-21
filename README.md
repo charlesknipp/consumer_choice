@@ -16,10 +16,16 @@ The construction of the problem is nothing new, however the process of calculati
 
 ## Notes on the Lagrange Dual Approach (n goods)
 
-let `f(x)` be the objective constrained by both a sequence of inequalities `g_i(x)` and sequence of equlaity constraints `h_j(x)` respectively indexed by `i \in {1,...,m}` and `j \in {1,...,l}`
+Let `f(x)` be the objective constrained by both a sequence of inequalities `g_i(x)` and sequence of equlaity constraints `h_j(x)` respectively indexed by `i \in {1,...,m}` and `j \in {1,...,l}`
 
 Kuhn Tucker States that the following conditions must hold:
 1. `g_i(x^*) \geq 0` and `h_j(x^*) = 0`
 2. `\mu_i \geq 0`
 3. `\mu_i g_i(x*) = 0`
 4. `Df_x(x^*) + \sum_{j=1}^{l} \lambda_j^* Dh_j(x^*) + \sum_{i=1}^{m} \mu_i^* Dg_i(x^*) = 0`
+
+## Notes on the n-dimensional Marshallian Approach
+
+This set up mirrors the one in `consumer_choice.py` fairly closely with some minor differences in the definitions of the budget set and utiltiy set to fit higher dimension optimization. The code performs the algorithm of the first one by fixing higher dimensions, and solves for the optimal solution in 2 dimensions; this iteration progresses until increases in the higher dimensions result in lower utility than previous iterations.
+
+I'm still trying to find a better use of convexity in higher dimensions to reduce the time complexity of the algorithm, but it's well on its way.

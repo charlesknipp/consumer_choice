@@ -140,4 +140,4 @@ for x in tqdm(v):
 elapsed_time = time.time() - start_time
 
 print(bundles[-1])
-print(elapsed_time)
+print('%.5f seconds elapsed' % elapsed_time)

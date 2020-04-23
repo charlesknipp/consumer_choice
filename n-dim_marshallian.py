@@ -54,7 +54,7 @@ def nIteration(xi,m):
     m = m-p[-1]*xi[-1]
 
     a = t[0]
-    b= t[1]
+    b = t[1]
 
     def findIntersection(x,utility):
         min_f = abs(indifference(x[0],utility,[a,b]) - budget(x[0],m,p))

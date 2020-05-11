@@ -112,6 +112,7 @@ def nIteration(xi,m):
 
 # come up with some clever way of iterating it over higher dimensions
 
+start_time = time.time()
 v = [round(x*.1,2) for x in range(1,math.ceil(m/p[0])*10)]
 base = nIteration(x1,m)
 max_u = [math.prod([base[i]**t[i] for i in range(n)])]
@@ -136,5 +137,7 @@ for x in tqdm(v):
     else:
         continue
 
+elapsed_time = time.time() - start_time
+
 print(bundles[-1])
-print(max_u)
+print('%.5f seconds elapsed' % elapsed_time)

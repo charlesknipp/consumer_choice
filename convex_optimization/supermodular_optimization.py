@@ -37,6 +37,10 @@ def U(x1,utility,preferences):
     return (u*x1**(-a))**(1/b)
 
 
+# the only problem I have with this algorithm is the use of the mean value, but
+# I don't have an alternative especially since using the Marshallian case is
+# far more computationally intensive
+
 def hicksianCase(utility,preferences,prices,precision=3):
     '''
     computes the optimal bundle given a level of indifference between two goods
@@ -52,8 +56,6 @@ def hicksianCase(utility,preferences,prices,precision=3):
         bundle (tuple): the optimal bundle of x to minimize expenditures subject
         to utility
     '''
-
-    start_time = time.time()
 
     k1 = 10**precision
     k2 = 1/k1
@@ -117,84 +119,30 @@ def hicksianCase(utility,preferences,prices,precision=3):
         bounds = findIntersection(x,m)
 
     bundle = (bounds[0],B(bounds[0],m,p))
-    elapsed_time = time.time() - start_time
 
-    return bundle, elapsed_time
-
-def marshellianDemand(income,preferences,prices,plot,precision=3):
-    '''
-    computes the optimal bundle given a defined budget to spend between two 
-    goods
-
-    parameters:
-        budget (int):
-        preference_parameter (array): an array of taste parameters that applies
-        to utility
-        prices (array): an array containing the prices of good 1 and good 2
-
-    returns:
-        bundle (tuple): the optimal bundle x to maximize utility subject to a
-        budget constraint
-    '''
-
-    start_time = time.time()
-
-    k1 = 10**precision
-    k2 = 1/k1
-    a = preferences[0]
-    b = preferences[1]
-    m = income
-    p = prices
-    u = ((.5*m/p[0])**a)*((.5*m/p[1]))**(b)
+    return bundle
 
 
-    def findIntersection(x,utility):
-        min_f = abs(U(x[0],utility,[a,b]) - B(x[0],m,p))
-        max_f = abs(U(x[-1],utility,[a,b]) - B(x[-1],m,p))
-        min_x = x[0]
-        max_x = x[-1]
-        for i in x:
-            diff = U(i,utility,[a,b]) - B(i,m,p)
-            next_diff = U(i+k2,utility,[a,b]) - B(i+k2,m,p)
-            if diff < min_f:
-                min_f = abs(diff)
-                min_x = i
-                if abs(diff) <= abs(next_diff):
-                    break
+start_time = time.time()
 
-        for i in list(reversed(x)):
-            diff = U(i,utility,[a,b]) - B(i,m,p)
-            prev_diff = U(i-k2,utility,[a,b]) - B(i-k2,m,p)
-            if diff < max_f:
-                max_f = abs(diff)
-                max_x = i
-                if abs(diff) <= abs(prev_diff):
-                    break
+ui = []
+n = 2
+ctr = 0
 
-        bds = [min_x,max_x]
-        return bds
+p = [3,2]
+t = [.3,.7]
+m = 100
 
-    def adjust(lower_bound,upper_bound):
-        x1 = (lower_bound+upper_bound)/2
-        x2 = B(x1,m,p)
-        utility = ((x1)**a)*((x2))**(b)
+xi = [(n**(-1))*m/p[i] for i in range(n)]
+ui.append(math.prod([xi[i]**t[i] for i in range(n)]))
 
-        return utility
+while True:
+    z = hicksianCase(ui[-1],t,p)
+    zi = (z[0],B(z[0],m,p))
+    ui.append(math.prod([zi[i]**t[i] for i in range(n)]))
 
-    x = [round(x*k2,precision) for x in range(1,math.ceil(m/p[0])*k1+1)]
+    if m-sum([z[i]*p[i] for i in range(n)]) < .00001:
+        break
 
-    bounds = findIntersection(x,u)
-    iters = [u]
-
-    while True:
-        if bounds[1] - bounds[0] > k2:
-            u = adjust(bounds[0],bounds[1])
-            iters.append(u)
-        else:
-            break
-        bounds = findIntersection(x,u)
-
-    bundle = (bounds[0],U(bounds[0],u,[a,b]))
-    elapsed_time = time.time() - start_time
-
-    return bundle, elapsed_time
+elapsed_time = time.time() - start_time
+print(hicksianCase(ui[-2],t,p))

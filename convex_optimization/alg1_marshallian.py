@@ -2,19 +2,25 @@ import time
 import math
 
 
+# this version uses the linear combination of values along an equivalence class,
+# which are constrained to a sublattice valued budget set.
+
 def marshellianDemand(income,preferences,prices):
     '''
-    computes the optimal bundle given a defined budget to spend between two 
-    goods
+    computes an optimal bundle given a convex objective and a linear constraint, 
+    in the context of consumer theory; this particular instance limits the user 
+    to a Cobb-Douglas utility function, but can easily be expanded to more 
+    general expressions.
 
     parameters:
-        budget (int):
-        preferences (array): an array of taste parameters that applies
-        to utility
+        income (int): the amount of money that the  consumer is constrained to 
+        spending
+        preferences (array): an array of taste parameters that applies to 
+        utility
         prices (array): an array containing the prices of good 1 and good 2
 
     returns:
-        bundle (tuple): the optimal bundle x to maximize utility subject to a
+        bundle (tuple): the optimal bundle x to maximize utility subject to a 
         budget constraint
     '''
 
@@ -36,8 +42,12 @@ def marshellianDemand(income,preferences,prices):
 
     def findIntersection(utility):
         '''
-        Calculates the intersection of two curves using a dynamic step size that
+        Calculates the intersection of two curves using a dynamic step size that 
         finds a lower limit and divides that interval by 10 each time.
+
+        returns:
+            bounds (array): structured like (min,max), this array represents the 
+            points of intersection of the given curve
         '''
 
         def findMin(x,k):

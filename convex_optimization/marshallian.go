@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"sort"
+	"time"
 )
 
 var m, k, u float64
@@ -90,16 +92,7 @@ func findIntersection(x []float64, utility float64) []float64 {
 		}
 	}
 
-	// should reverse the list, but I'm not too sure how computationally sound
-	// this mehtod is; also this is my second program in go, so...
-
-	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
-		x[i], x[j] = x[j], x[i]
-	}
-
-	// loop it for the reversed array
-
-	for i := 0; i < len(x); i++ {
+	for i := len(x) - 1; i >= 0; i-- {
 
 		diff := U(x[i], utility, t) - B(x[i], m, p)
 		prev_diff := U(x[i]-k, utility, t) - B(x[i]-k, m, p)
@@ -124,6 +117,8 @@ func findIntersection(x []float64, utility float64) []float64 {
 // iterate until the lower bound and upper bound converge to a single value
 
 func main() {
+	start := time.Now()
+
 	k = .001
 	m = 100
 
@@ -136,11 +131,6 @@ func main() {
 	var bounds []float64
 	bounds = findIntersection(s, u)
 
-	// the following iteration does not work for whatever reason; the equival-
-	// ence class U() is convex hence the average of any two points should be
-	// a higher value of u, but somehow u = adjust() seen below just alternates
-	// between the first iteration and second iteration.
-
 	for bounds[1]-bounds[0] > k {
 
 		// find an average between the bounds and calibrate a new equivalence
@@ -150,11 +140,12 @@ func main() {
 		bounds = findIntersection(s, u)
 	}
 
-	bundle := []float64{bounds[0], U(bounds[0], m, p)}
+	bundle := []float64{bounds[0], B(bounds[0], m, p)}
 
 	for i := 0; i < len(bundle); i++ {
 		fmt.Printf("%.3f\t", bundle[i])
 	}
 
-	fmt.Printf("%.4f", u)
+	elapsed := time.Since(start)
+	log.Printf("\ntime: %dms", elapsed.Microseconds()/1000)
 }

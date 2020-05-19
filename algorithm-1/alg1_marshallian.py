@@ -30,6 +30,7 @@ def marshellianDemand(income,preferences,prices):
     b = preferences[1]
     m = income
     p = prices
+    
     u = ((.5*m/p[0])**a)*((.5*m/p[1]))**(b)
 
     def U(x1,utl):
@@ -90,8 +91,8 @@ def marshellianDemand(income,preferences,prices):
 
         for i in range(1,n+1):
             k = 10**(-i)
-            mnx = [min_x[-1]+j*(k) for j in range(0,10)]
-            mxx = [max_x[-1]+j*(k) for j in range(0,10)]
+            mnx = [round(min_x[-1]+j*(k),i) for j in range(0,10)]
+            mxx = [round(max_x[-1]+j*(k),i) for j in range(0,10)]
 
             min_x.append(findMin(mnx,k))
             max_x.append(findMax(mxx,k))

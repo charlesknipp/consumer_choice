@@ -7,21 +7,21 @@ import math
 
 def hicksianDemand(utility,preferences,prices):
     '''
-    computes an optimal bundle given a convex objective and a linear constraint, 
+    computes an optimal bundle given a convex constraint and a linear objective, 
     in the context of consumer theory; this particular instance limits the user 
     to a Cobb-Douglas utility function, but can easily be expanded to more 
     general expressions.
 
     parameters:
-        income (int): the amount of money that the  consumer is constrained to 
-        spending
+        utility (int): the level of indifference represented by the preference 
+        relation on the positive reals
         preferences (array): an array of taste parameters that applies to 
         utility
         prices (array): an array containing the prices of good 1 and good 2
 
     returns:
-        bundle (tuple): the optimal bundle x to maximize utility subject to a 
-        budget constraint
+        bundle (tuple): the optimal bundle x to maximize expenditure subject to 
+        an indifference class
     '''
 
     start_time = time.time()
@@ -33,8 +33,6 @@ def hicksianDemand(utility,preferences,prices):
 
     x_i = [u**(1/(a+b)),u**(1/(a+b))]
     m = sum([x_i[i]*p[i] for i in range(2)])
-
-    print(m)
 
     def U(x1,utl):
         return (utl*x1**(-a))**(1/b)
@@ -111,9 +109,8 @@ def hicksianDemand(utility,preferences,prices):
         x1 = (lower_bound+upper_bound)/2
         x2 = U(x1,u)
         bundle = [x1,x2]
-        budget = sum([bundle[i]*p[i] for i in range(2)])
 
-        return budget
+        return sum([bundle[i]*p[i] for i in range(2)])
 
 
     bounds = findIntersection(m)

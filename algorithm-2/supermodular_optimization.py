@@ -1,124 +1,128 @@
 import math
 import time
 
-# Work in progress!!!! Not finished
 
-def B(x1,income,prices):
+def U(x1,utl):
+    a = t[0]
+    b = t[1]
+    return (utl*x1**(-a))**(1/b)
+
+
+def B(x1,inc):
+    return ((inc-p[0]*x1)/p[1])
+
+
+def hicksianCase(utility,preferences,prices):
     '''
-    parameters:
-        x1 (float): any amount of good 1
-        income (float): a level of income m
-        prices (array): a vector of prices (p1,p2)
-    returns:
-        x2 (float): an amount of good 2 that fits within the given budget
-    '''
-
-    p = prices
-    m = income
-
-    return ((m-p[0]*x1)/p[1])
-
-
-def U(x1,utility,preferences):
-    '''
-    parameters:
-        x1 (float): any amount of good 1
-        utility (float): a given level of indifference
-        preferences (array): a vector of parameters per each good (a,b)
-
-    returns:
-        x2 (float): a value for good 2 that keeps the consumer indifferent
-    '''
-
-    u = utility
-    a = preferences[0]
-    b = preferences[1]
-    
-    return (u*x1**(-a))**(1/b)
-
-
-# the only problem I have with this algorithm is the use of the mean value, but
-# I don't have an alternative especially since using the Marshallian case is
-# far more computationally intensive
-
-def hicksianCase(utility,preferences,prices,precision=3):
-    '''
-    computes the optimal bundle given a level of indifference between two goods
+    computes an optimal bundle given a convex constraint and a linear objective, 
+    in the context of consumer theory; this particular instance limits the user 
+    to a Cobb-Douglas utility function, but can easily be expanded to more 
+    general expressions.
 
     parameters:
-        utility (int): the constrained level of indifference
-        preferences (array): an array of taste parameters that applies to
+        utility (int): the level of indifference represented by the preference 
+        relation on the positive reals
+        preferences (array): an array of taste parameters that applies to 
         utility
         prices (array): an array containing the prices of good 1 and good 2
-        precision (int): the power representing the decimal place of accuracy
 
     returns:
-        bundle (tuple): the optimal bundle of x to minimize expenditures subject
-        to utility
+        bundle (tuple): the optimal bundle x to maximize expenditure subject to 
+        an indifference class
     '''
 
-    k1 = 10**precision
-    k2 = 1/k1
+
     a = preferences[0]
     b = preferences[1]
     u = utility
-    x_i = [u**(1/(a+b)),u**(1/(a+b))]
     p = prices
+
+    x_i = [u**(1/(a+b)),u**(1/(a+b))]
     m = sum([x_i[i]*p[i] for i in range(2)])
 
 
-    def findIntersection(x,income):
-        min_f = abs(U(x[0],u,[a,b]) - B(x[0],income,p))
-        max_f = abs(U(x[-1],u,[a,b]) - B(x[-1],income,p))
-        min_x = x[0]
-        max_x = x[-1]
-        for i in x:
-            diff = U(i,u,[a,b]) - B(i,income,p)
-            next_diff = U(i+k2,u,[a,b]) - B(i+k2,income,p)
-            if diff < min_f:
-                min_f = abs(diff)
-                min_x = i
-                if abs(diff) <= abs(next_diff):
-                    break
+    def findIntersection(income):
+        '''
+        Calculates the intersection of two curves using a dynamic step size that 
+        finds a lower limit and divides that interval by 10 each time.
 
-        for i in list(reversed(x)):
-            diff = U(i,u,[a,b]) - B(i,income,p)
-            prev_diff = U(i-k2,u,[a,b]) - B(i-k2,income,p)
-            if diff < max_f:
-                max_f = abs(diff)
-                max_x = i
-                if abs(diff) <= abs(prev_diff):
-                    break
+        returns:
+            bounds (array): structured like (min,max), this array represents the 
+            points of intersection of the given curve
+        '''
 
-        bds = [min_x,max_x]
+        def findMin(x,k):
+            min_f = abs(U(x[0],u) - B(x[0],income))
+            min_x = x[0]
+
+            for i in x:
+                diff = U(i,u) - B(i,income)
+                next_diff = U(i+k,u) - B(i+k,income)
+                if diff < min_f:
+                    min_f = abs(diff)
+                    min_x = i
+                    if abs(diff) <= abs(next_diff):
+                        break
+
+            return min_x
+
+
+        def findMax(x,k):
+            max_f = abs(U(x[-1],u) - B(x[-1],income))
+            max_x = x[-1]
+
+            for i in list(reversed(x)):
+                diff = U(i+k,u) - B(i+k,income)
+                prev_diff = U(i,u) - B(i,income)
+                if diff < max_f:
+                    max_f = abs(prev_diff)
+                    max_x = i
+                    if abs(diff) <= abs(prev_diff):
+                        break
+
+            return max_x
+
+
+        n = 3
+        x = range(1,math.floor(m/p[0])+1)
+
+        min_x = [findMin(x,1)]
+        max_x = [findMax(x,1)]
+
+        for i in range(1,n+1):
+            k = 10**(-i)
+            mnx = [round(min_x[-1]+j*(k),i) for j in range(0,10)]
+            mxx = [round(max_x[-1]+j*(k),i) for j in range(0,10)]
+
+            min_x.append(findMin(mnx,k))
+            max_x.append(findMax(mxx,k))
+
+        final_min = min_x[-1]
+        final_max = max_x[-1]
+
+        bds = [final_min,final_max]
         return bds
 
-    # adjust the selection to a supermodular euclidean higher selection on B()
-    # solve the Hicksian case first then use that to converge to a Marshallian
-    # solution?
 
     def adjust(lower_bound,upper_bound):
         x1 = (lower_bound+upper_bound)/2
-        x2 = U(x1,u,[a,b])
+        x2 = U(x1,u)
         bundle = [x1,x2]
-        budget = sum([bundle[i]*p[i] for i in range(2)])
 
-        return budget
+        return sum([bundle[i]*p[i] for i in range(2)])
 
-    x = [round(x*k2,precision) for x in range(1,math.ceil(m/p[0])*k1+1)]
 
-    bounds = findIntersection(x,m)
-    iters = [m]
+    bounds = findIntersection(m)
 
     while True:
-        if bounds[1] - bounds[0] > k2:
+        if bounds[1] - bounds[0] > .001:
             m = adjust(bounds[0],bounds[1])
-            iters.append(m)
         else:
             break
-        bounds = findIntersection(x,m)
 
-    bundle = (bounds[0],B(bounds[0],m,p))
+        bounds = findIntersection(m)
+
+    bundle = (bounds[0],B(bounds[0],m))
 
     return bundle
 
@@ -127,10 +131,10 @@ start_time = time.time()
 
 ui = []
 n = 2
-ctr = 0
 
 p = [3,2]
-t = [.3,.7]
+a,b = .3,.7
+t = [a,b]
 m = 100
 
 xi = [(n**(-1))*m/p[i] for i in range(n)]
@@ -138,11 +142,14 @@ ui.append(math.prod([xi[i]**t[i] for i in range(n)]))
 
 while True:
     z = hicksianCase(ui[-1],t,p)
-    zi = (z[0],B(z[0],m,p))
+    zi = (z[0],B(z[0],m))
     ui.append(math.prod([zi[i]**t[i] for i in range(n)]))
 
     if m-sum([z[i]*p[i] for i in range(n)]) < .00001:
         break
 
+hcks = hicksianCase(ui[-2],t,p)
 elapsed_time = time.time() - start_time
-print(hicksianCase(ui[-2],t,p))
+
+print('bundle:\t(%.2f,%.2f)' % hcks)
+print('time:\t%.3f ms' % (elapsed_time*1000))

@@ -24,8 +24,6 @@ def marshellianDemand(income,preferences,prices):
         budget constraint
     '''
 
-    start_time = time.time()
-
     a = preferences[0]
     b = preferences[1]
     m = income
@@ -122,15 +120,12 @@ def marshellianDemand(income,preferences,prices):
         bounds = findIntersection(u)
 
     bundle = (bounds[0],U(bounds[0],u))
-    elapsed_time = time.time() - start_time
 
-    return [bundle,elapsed_time]
+    return bundle
 
+start_time = time.time()
+bundle = marshellianDemand(100,[.3,.7],[3,2])
+elapsed_time = time.time() - start_time
 
-v = marshellianDemand(100,[.3,.7],[3,2])
-bundle = v[0]
-time = v[1]
-
-
-print('bundle:\t(%.2f,%.2f)' % v[0])
-print('time:\t%.3f microseconds' % (v[1]*1000))
+print('bundle:\t(%.2f,%.2f)' % bundle)
+print('time:\t%.3f ms' % (elapsed_time*1000))

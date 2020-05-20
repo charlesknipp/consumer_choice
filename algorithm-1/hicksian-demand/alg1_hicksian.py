@@ -24,8 +24,6 @@ def hicksianDemand(utility,preferences,prices):
         an indifference class
     '''
 
-    start_time = time.time()
-
     a = preferences[0]
     b = preferences[1]
     u = utility
@@ -124,15 +122,13 @@ def hicksianDemand(utility,preferences,prices):
         bounds = findIntersection(m)
 
     bundle = (bounds[0],B(bounds[0],m))
-    elapsed_time = time.time() - start_time
 
-    return [bundle,elapsed_time]
-
-
-v = hicksianDemand(24.03519395349548,[.3,.7],[3,2])
-bundle = v[0]
-time = v[1]
+    return bundle
 
 
-print('bundle:\t(%.2f,%.2f)' % v[0])
-print('time:\t%.3f microseconds' % (v[1]*1000))
+start_time = time.time()
+bundle = hicksianDemand(24.03519395349548,[.3,.7],[3,2])
+elapsed_time = time.time() - start_time
+
+print('bundle:\t(%.2f,%.2f)' % bundle)
+print('time:\t%.3f ms' % (elapsed_time*1000))

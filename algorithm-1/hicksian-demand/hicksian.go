@@ -157,11 +157,11 @@ func main() {
 	}
 
 	bundle := []float64{bounds[0], B(bounds[0], m)}
+	elapsed := time.Since(start)
 
 	for i := 0; i < len(bundle); i++ {
 		fmt.Printf("%.3f\t", bundle[i])
 	}
 
-	elapsed := time.Since(start)
 	fmt.Printf("\ntime: %s", elapsed)
 }

@@ -52,7 +52,7 @@ func findMin(x []float64, step, utility float64) float64 {
 	return min_x
 }
 
-// now define the intersection closest to +INF:
+// this shit is still broken:
 func findMax(x []float64, step, utility float64) float64 {
 	max_f := math.Abs(U(x[len(x)-1], utility) - B(x[len(x)-1], m))
 	max_x := x[len(x)-1]

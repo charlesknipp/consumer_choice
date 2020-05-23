@@ -65,7 +65,7 @@ def hicksianDemand(utility,preferences,prices):
 
             return min_x
 
-
+        # also probably broken
         def findMax(x,k):
             max_f = abs(U(x[-1],u) - B(x[-1],income))
             max_x = x[-1]

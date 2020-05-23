@@ -64,14 +64,14 @@ def marshellianDemand(income,preferences,prices):
 
             return min_x
 
-
+        # still broken somehow
         def findMax(x,k):
             max_f = abs(U(x[-1],utility) - B(x[-1],m))
             max_x = x[-1]
 
             for i in list(reversed(x)):
-                diff = U(i+k,utility) - B(i+k,m)
-                prev_diff = U(i,utility) - B(i,m)
+                diff = U(i,utility) - B(i,m)
+                prev_diff = U(i+k,utility) - B(i+k,m)
                 if diff < max_f:
                     max_f = abs(diff)
                     max_x = i
@@ -124,7 +124,7 @@ def marshellianDemand(income,preferences,prices):
     return bundle
 
 start_time = time.time()
-bundle = marshellianDemand(100,[.3,.7],[3,2])
+bundle = marshellianDemand(9,[1,1],[1,1])
 elapsed_time = time.time() - start_time
 
 print('bundle:\t(%.2f,%.2f)' % bundle)

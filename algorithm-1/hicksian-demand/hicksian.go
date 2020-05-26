@@ -40,7 +40,7 @@ func findMin(x []float64, step, income float64) float64 {
 		if diff < min_f {
 
 			min_f = math.Abs(diff)
-			min_x = x[i]
+			min_x = x[i] - step
 
 			if math.Abs(diff) <= math.Abs(next_diff) {
 				break
@@ -66,7 +66,7 @@ func findMax(x []float64, step, income float64) float64 {
 		if diff < max_f {
 
 			max_f = math.Abs(diff)
-			max_x = x[i-1]
+			max_x = x[i] - step
 
 			if math.Abs(diff) <= math.Abs(prev_diff) {
 				break
@@ -99,7 +99,7 @@ func findIntersection(income float64) []float64 {
 		var mnx []float64
 		var mxx []float64
 
-		for j := 0; j < 10; j++ {
+		for j := 0; j < 20; j++ {
 
 			mn := min_x[len(min_x)-1] + (float64(j) / k)
 			mx := max_x[len(max_x)-1] + (float64(j) / k)

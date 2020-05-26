@@ -40,7 +40,7 @@ func findMin(x []float64, step, utility float64) float64 {
 		if diff < min_f {
 
 			min_f = math.Abs(diff)
-			min_x = x[i]
+			min_x = x[i] - step
 
 			if math.Abs(diff) <= math.Abs(next_diff) {
 				break
@@ -52,7 +52,7 @@ func findMin(x []float64, step, utility float64) float64 {
 	return min_x
 }
 
-// this shit is still broken:
+// now define the intersection closest to +INF:
 func findMax(x []float64, step, utility float64) float64 {
 	max_f := math.Abs(U(x[len(x)-1], utility) - B(x[len(x)-1], m))
 	max_x := x[len(x)-1]
@@ -66,7 +66,7 @@ func findMax(x []float64, step, utility float64) float64 {
 		if diff < max_f {
 
 			max_f = math.Abs(diff)
-			max_x = x[i-1]
+			max_x = x[i] - step
 
 			if math.Abs(diff) <= math.Abs(prev_diff) {
 				break
@@ -99,7 +99,7 @@ func findIntersection(utility float64) []float64 {
 		var mnx []float64
 		var mxx []float64
 
-		for j := 0; j < 10; j++ {
+		for j := 0; j < 20; j++ {
 
 			mn := min_x[len(min_x)-1] + (float64(j) / k)
 			mx := max_x[len(max_x)-1] + (float64(j) / k)
@@ -138,10 +138,10 @@ func main() {
 	start := time.Now()
 
 	k = .001
-	m = 100
+	m = 9
 
-	t[0], t[1] = .3, .7
-	p[0], p[1] = 3, 2
+	t[0], t[1] = 1, 1
+	p[0], p[1] = 1, 1
 
 	u = math.Pow(.5*(m/p[0]), t[0]) * math.Pow(.5*(m/p[1]), t[1])
 

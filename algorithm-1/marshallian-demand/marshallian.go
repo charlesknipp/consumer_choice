@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"sort"
 	"time"
 )
 
@@ -11,17 +10,15 @@ var m, k, u float64
 var t [2]float64
 var p [2]float64
 
-var utility float64 // unsure whether this is okay for the final product
+var utility float64
 
 // define the two intersecting curves:
 func B(x1, income float64) float64 {
-
 	x2 := (income - (p[0] * x1)) / p[1]
 	return x2
 }
 
 func U(x1, utility float64) float64 {
-
 	x2 := math.Pow((utility / math.Pow(x1, t[0])), (1 / t[1]))
 	return x2
 }
@@ -54,7 +51,7 @@ func findMin(x []float64, step, utility float64) float64 {
 
 // now define the intersection closest to +INF:
 func findMax(x []float64, step, utility float64) float64 {
-	max_f := math.Abs(U(x[len(x)-1], utility) - B(x[len(x)-1], m))
+	max_f := U(x[len(x)-1], utility) - B(x[len(x)-1], m)
 	max_x := x[len(x)-1]
 
 	for i := len(x) - 1; i >= 0; i-- {
@@ -96,8 +93,8 @@ func findIntersection(utility float64) []float64 {
 
 		k := math.Pow(10, float64(i))
 
-		var mnx []float64
-		var mxx []float64
+		mnx := make([]float64, 20)
+		mxx := make([]float64, 20)
 
 		for j := 0; j < 20; j++ {
 
@@ -107,8 +104,8 @@ func findIntersection(utility float64) []float64 {
 			round_mn := math.Round(mn*k) / k
 			round_mx := math.Round(mx*k) / k
 
-			mnx = append(mnx, round_mn)
-			mxx = append(mxx, round_mx)
+			mnx[j] = round_mn
+			mxx[j] = round_mx
 		}
 
 		min_x = append(min_x, findMin(mnx, 1/k, utility))
@@ -119,7 +116,6 @@ func findIntersection(utility float64) []float64 {
 	final_max := max_x[len(max_x)-1]
 
 	bds := []float64{final_min, final_max}
-	sort.Float64s(bds)
 	return bds
 }
 

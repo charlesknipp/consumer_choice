@@ -25,7 +25,7 @@ func U(x1, utility float64) float64 {
 
 // now define the intersection closest to 0:
 func findMin(x []float64, step, utility float64) float64 {
-	min_f := math.Abs(U(x[0], utility) - B(x[0], m))
+	min_f := U(x[0], utility) - B(x[0], m)
 	min_x := x[0]
 
 	for i := 0; i < len(x); i++ {

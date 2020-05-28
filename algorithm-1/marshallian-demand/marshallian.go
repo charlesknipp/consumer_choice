@@ -25,10 +25,11 @@ func U(x1, utility float64) float64 {
 
 // now define the intersection closest to 0:
 func findMin(x []float64, step, utility float64) float64 {
+	pos := len(x)
 	min_f := U(x[0], utility) - B(x[0], m)
 	min_x := x[0]
 
-	for i := 0; i < len(x); i++ {
+	for i := 0; i < pos; i++ {
 
 		diff := U(x[i], utility) - B(x[i], m)
 		next_diff := U(x[i]+step, utility) - B(x[i]+step, m)
@@ -51,10 +52,11 @@ func findMin(x []float64, step, utility float64) float64 {
 
 // now define the intersection closest to +INF:
 func findMax(x []float64, step, utility float64) float64 {
-	max_f := U(x[len(x)-1], utility) - B(x[len(x)-1], m)
-	max_x := x[len(x)-1]
+	pos := len(x) - 1
+	max_f := U(x[pos], utility) - B(x[pos], m)
+	max_x := x[pos]
 
-	for i := len(x) - 1; i >= 0; i-- {
+	for i := pos; i >= 0; i-- {
 
 		diff := U(x[i], utility) - B(x[i], m)
 		prev_diff := U(x[i]-step, utility) - B(x[i]-step, m)
@@ -86,8 +88,11 @@ func findIntersection(utility float64) []float64 {
 
 	// fmt.Println(x)
 
-	min_x := []float64{findMin(x, 1, utility)}
-	max_x := []float64{findMax(x, 1, utility)}
+	min_x := make([]float64, n+1)
+	min_x[0] = findMin(x, 1, utility)
+
+	max_x := make([]float64, n+1)
+	max_x[0] = findMax(x, 1, utility)
 
 	for i := 1; i < n+1; i++ {
 
@@ -98,8 +103,8 @@ func findIntersection(utility float64) []float64 {
 
 		for j := 0; j < 20; j++ {
 
-			mn := min_x[len(min_x)-1] + (float64(j) / k)
-			mx := max_x[len(max_x)-1] + (float64(j) / k)
+			mn := min_x[i-1] + (float64(j) / k)
+			mx := max_x[i-1] + (float64(j) / k)
 
 			round_mn := math.Round(mn*k) / k
 			round_mx := math.Round(mx*k) / k
@@ -108,12 +113,12 @@ func findIntersection(utility float64) []float64 {
 			mxx[j] = round_mx
 		}
 
-		min_x = append(min_x, findMin(mnx, 1/k, utility))
-		max_x = append(max_x, findMax(mxx, 1/k, utility))
+		min_x[i] = findMin(mnx, 1/k, utility)
+		max_x[i] = findMax(mxx, 1/k, utility)
 	}
 
-	final_min := min_x[len(min_x)-1]
-	final_max := max_x[len(max_x)-1]
+	final_min := min_x[n]
+	final_max := max_x[n]
 
 	bds := []float64{final_min, final_max}
 	return bds
@@ -155,7 +160,7 @@ func main() {
 	bundle := []float64{bounds[0], B(bounds[0], m)}
 	elapsed := time.Since(start)
 
-	for i := 0; i < len(bundle); i++ {
+	for i := 0; i < 2; i++ {
 		fmt.Printf("%.3f\t", bundle[i])
 	}
 

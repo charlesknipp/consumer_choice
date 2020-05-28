@@ -59,23 +59,25 @@ def hicksianDemand(utility,preferences,prices):
                 next_diff = U(i+k,u) - B(i+k,income)
                 if diff < min_f:
                     min_f = abs(diff)
-                    min_x = i
+                    min_x = i-k
                     if abs(diff) <= abs(next_diff):
                         break
 
             return min_x
 
-        # also probably broken
+        # only works if you set prev_diff as the base and return -2k instead of
+        # setting the base as diff like I did in Go (which works flawlessly)
+        
         def findMax(x,k):
             max_f = abs(U(x[-1],u) - B(x[-1],income))
             max_x = x[-1]
 
             for i in list(reversed(x)):
-                diff = U(i+k,u) - B(i+k,income)
-                prev_diff = U(i,u) - B(i,income)
+                diff = U(i,u) - B(i,income)
+                prev_diff = U(i-k,u) - B(i-k,income)
                 if diff < max_f:
                     max_f = abs(prev_diff)
-                    max_x = i
+                    max_x = i-2*k
                     if abs(diff) <= abs(prev_diff):
                         break
 
@@ -90,8 +92,8 @@ def hicksianDemand(utility,preferences,prices):
 
         for i in range(1,n+1):
             k = 10**(-i)
-            mnx = [round(min_x[-1]+j*(k),i) for j in range(0,10)]
-            mxx = [round(max_x[-1]+j*(k),i) for j in range(0,10)]
+            mnx = [round(min_x[-1]+j*(k),i) for j in range(0,20)]
+            mxx = [round(max_x[-1]+j*(k),i) for j in range(0,20)]
 
             min_x.append(findMin(mnx,k))
             max_x.append(findMax(mxx,k))

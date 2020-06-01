@@ -23,6 +23,10 @@ The problem is a basic Marshallian Demand, but usign duality to converge to a so
 5. Using this euclidean higher point, find the corresponding indfference class and optimize
 6. Stop the iteration when the value function of the Hicksian case equals the constrained budget.
 
+## Algorithm 3
+
+The simplest of approaches, lowest time complexity, and far and away the most obvious approach. Regardless, this algorithm just iterates along all feasible bundles and creates a sorted dictionary containing the bundle and outcome. Using `sorted()` we return the highest/lowest value depending on the approach. Further optimization required by using the `findIntersection()` optimization from the previous algorithms.
+
 ## Notes on the Lagrange Dual Approach (n goods)
 
 Let `f(x)` be the objective constrained by both a sequence of inequalities `g_i(x)` and sequence of equlaity constraints `h_j(x)` respectively indexed by `i \in \{1,...,m\}` and `j \in \{1,...,l\}`

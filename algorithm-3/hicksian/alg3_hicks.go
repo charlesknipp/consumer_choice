@@ -19,6 +19,7 @@ func I(x1 float64) float64 {
 }
 
 // allows me to sort through a map as an ordered object
+
 type kv struct {
 	key float64
 	val float64
@@ -33,6 +34,7 @@ func main() {
 	u = 24.035193953495487
 
 	// monotonicity/convexity implies x1 is not bounded on an equivalence class
+
 	m := p[0]*math.Pow(u, 1/(t[0]+t[1])) + p[1]*math.Pow(u, 1/(t[0]+t[1]))
 
 	dnsty := int(math.Ceil((m / p[0]) * 1000))

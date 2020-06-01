@@ -19,6 +19,7 @@ func B(x1 float64) float64 {
 }
 
 // allows me to sort through a map as an ordered object
+
 type kv struct {
 	key float64
 	val float64
@@ -31,6 +32,9 @@ func main() {
 	p[0], p[1] = 3, 2
 
 	m = 100
+
+	// since the marshallian constraint is naturally bounded, there is no need
+	// to test a base case
 
 	dnsty := int(math.Ceil((m / p[0]) * 1000))
 	marshallian_set := make(map[float64]float64)

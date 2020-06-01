@@ -18,6 +18,7 @@ func B(x1 float64) float64 {
 	return (m - (p[0] * x1)) / p[1]
 }
 
+// allows me to sort through a map as an ordered object
 type kv struct {
 	key float64
 	val float64
@@ -31,10 +32,10 @@ func main() {
 
 	m = 100
 
-	d1 := int(math.Ceil((m / p[0]) * 1000))
+	dnsty := int(math.Ceil((m / p[0]) * 1000))
 	marshallian_set := make(map[float64]float64)
 
-	for i := 1; i < int(d1); i++ {
+	for i := 1; i < int(dnsty); i++ {
 		x1 = float64(i) / 1000
 		x2 = B(x1)
 		marshallian_set[x1] = u(x1, x2)

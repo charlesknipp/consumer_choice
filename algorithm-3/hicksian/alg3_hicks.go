@@ -18,6 +18,7 @@ func I(x1 float64) float64 {
 	return math.Pow((u / math.Pow(x1, t[0])), (1 / t[1]))
 }
 
+// allows me to sort through a map as an ordered object
 type kv struct {
 	key float64
 	val float64
@@ -30,12 +31,14 @@ func main() {
 	p[0], p[1] = 3, 2
 
 	u = 24.035193953495487
+
+	// monotonicity/convexity implies x1 is not bounded on an equivalence class
 	m := p[0]*math.Pow(u, 1/(t[0]+t[1])) + p[1]*math.Pow(u, 1/(t[0]+t[1]))
 
-	d1 := int(math.Ceil((m / p[0]) * 1000))
+	dnsty := int(math.Ceil((m / p[0]) * 1000))
 	marshallian_set := make(map[float64]float64)
 
-	for i := 1; i < int(d1); i++ {
+	for i := 1; i < int(dnsty); i++ {
 		x1 = float64(i) / 1000
 		x2 = I(x1)
 		marshallian_set[x1] = e(x1, x2)

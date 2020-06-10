@@ -46,4 +46,5 @@ intr = [newtonsMethod(.0001),newtonsMethod(m/p[0])]
 elapsed_time = time.time() - start_time
 
 print(intr)
+print(B(intr[0],m))
 print('time:\t%.3f ms' % (elapsed_time*1000))

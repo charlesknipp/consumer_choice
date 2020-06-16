@@ -40,7 +40,7 @@ def hicksianDemand(utility,preferences,prices):
         return ((inc-p[0]*x1)/p[1])
 
 
-    def findIntersection(income):
+    def findIntersection(inc):
         '''
         Calculates the intersection of two curves using a dynamic step size that 
         finds a lower limit and divides that interval by 10 each time.
@@ -50,58 +50,33 @@ def hicksianDemand(utility,preferences,prices):
             points of intersection of the given curve
         '''
 
-        def findMin(x,k):
-            min_f = abs(U(x[0],u) - B(x[0],income))
-            min_x = x[0]
-
-            for i in x:
-                diff = U(i,u) - B(i,income)
-                next_diff = U(i+k,u) - B(i+k,income)
-                if diff < min_f:
-                    min_f = abs(diff)
-                    min_x = i-k
-                    if abs(diff) <= abs(next_diff):
-                        break
-
-            return min_x
-
-        # only works if you set prev_diff as the base and return -2k instead of
-        # setting the base as diff like I did in Go (which works flawlessly)
-        
-        def findMax(x,k):
-            max_f = abs(U(x[-1],u) - B(x[-1],income))
-            max_x = x[-1]
-
-            for i in list(reversed(x)):
-                diff = U(i,u) - B(i,income)
-                prev_diff = U(i-k,u) - B(i-k,income)
-                if diff < max_f:
-                    max_f = abs(prev_diff)
-                    max_x = i-2*k
-                    if abs(diff) <= abs(prev_diff):
-                        break
-
-            return max_x
+        def intersection(x1):
+            return (u*x1**(-a))**(1/b) - ((inc-p[0]*x1)/p[1])
 
 
-        n = 3
-        x = range(1,math.floor(m/p[0])+1)
+        def derive(value):
+            h = 0.0000001
+            top = intersection(value+h) - intersection(value)
+            bottom = h
+            slope = top / bottom
+            return slope
 
-        min_x = [findMin(x,1)]
-        max_x = [findMax(x,1)]
 
-        for i in range(1,n+1):
-            k = 10**(-i)
-            mnx = [round(min_x[-1]+j*(k),i) for j in range(0,20)]
-            mxx = [round(max_x[-1]+j*(k),i) for j in range(0,20)]
+        def newtonsMethod(x0,max_iters=30):
+            xn = x0
+            for n in range(0,max_iters):
+                fxn = intersection(xn)
+                if abs(fxn) < .00000001:
+                    return xn
+                Dfxn = derive(xn)
+                if Dfxn == 0:
+                    print('Zero derivative. No intersection found.')
+                    return None
+                xn = xn - fxn/Dfxn
+            print('Exceeded',n,'iterations. No intersection found.')
+            return None
 
-            min_x.append(findMin(mnx,k))
-            max_x.append(findMax(mxx,k))
-
-        final_min = min_x[-1]
-        final_max = max_x[-1]
-
-        bds = [final_min,final_max]
+        bds = [newtonsMethod(.0001),newtonsMethod(m/p[0])]
         return bds
 
 

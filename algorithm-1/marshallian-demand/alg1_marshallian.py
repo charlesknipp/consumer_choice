@@ -97,7 +97,6 @@ def marshellianDemand(income,preferences,prices):
         bounds = findIntersection(u)
 
     bundle = (bounds[0],U(bounds[0],u))
-
     return bundle
 
 start_time = time.time()

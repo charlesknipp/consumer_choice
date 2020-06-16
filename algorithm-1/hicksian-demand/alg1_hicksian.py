@@ -99,7 +99,6 @@ def hicksianDemand(utility,preferences,prices):
         bounds = findIntersection(m)
 
     bundle = (bounds[0],B(bounds[0],m))
-
     return bundle
 
 

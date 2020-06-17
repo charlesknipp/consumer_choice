@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"time"
@@ -38,32 +37,28 @@ func difference(x1, income, utility float64) float64 {
 }
 
 func derive(value, utility float64) float64 {
-	h := 0.0001
+	h := .0001
 	top := difference(value+h, m, utility) - difference(value, m, utility)
 	bottom := h
 
 	return top / bottom
 }
 
-func newtonsMethod(guess, utility float64) (float64, error) {
+func newtonsMethod(guess, utility float64) float64 {
 	xn := guess
 
-	for n := 0; n <= 20; n++ {
+	for n := 0; n <= 50; n++ {
 		fxn := difference(xn, m, utility)
 		Dfxn := derive(xn, utility)
 
-		if math.Abs(fxn) < .001 {
-			return xn, nil
-		}
-
-		if Dfxn == 0 {
-			return -100, errors.New("newtonsMethod: zero division")
+		if math.Abs(fxn) < .000000001 {
+			return xn
 		}
 
 		xn = xn - (fxn / Dfxn)
 	}
 
-	return -100, errors.New("newtonsMethod: exceeded max interations")
+	return xn
 }
 
 func adjust(lx, ux float64) float64 {
@@ -80,7 +75,6 @@ func adjust(lx, ux float64) float64 {
 
 func main() {
 	// this is for the Marshallian case
-	start := time.Now()
 
 	m = 100
 
@@ -89,20 +83,14 @@ func main() {
 
 	u = math.Pow(.5*(m/p[0]), t[0]) * math.Pow(.5*(m/p[1]), t[1])
 
-	var bounds [2]float64
-	bounds[0], _ = newtonsMethod(.0001, u)
-	bounds[1], _ = newtonsMethod(m/p[0], u)
+	start := time.Now()
+	var bounds []float64
+	bounds = []float64{newtonsMethod(.001, u), newtonsMethod(m/p[0], u)}
 
-	ctr := 0
 	for bounds[1]-bounds[0] > .001 {
 		u = adjust(bounds[0], bounds[1])
-		bounds[0], _ = newtonsMethod(bounds[0], u)
-		bounds[1], _ = newtonsMethod(bounds[1], u)
-		fmt.Println(bounds)
-		if ctr > 20 {
-			break
-		}
-		ctr += 1
+		bounds = []float64{newtonsMethod(.001, u), newtonsMethod(m/p[0], u)}
+		// fmt.Println(bounds)
 	}
 
 	bundle := []float64{bounds[0], B(bounds[0], m)}

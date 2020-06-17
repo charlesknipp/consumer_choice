@@ -55,7 +55,7 @@ def hicksianDemand(utility,preferences,prices):
 
 
         def derive(value):
-            h = 0.0000001
+            h = .0000001
             top = intersection(value+h) - intersection(value)
             bottom = h
             slope = top / bottom

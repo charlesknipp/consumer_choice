@@ -6,14 +6,6 @@ import (
 	"time"
 )
 
-/*
-	this version should rewrite the intersection without the use of separate
-	functions to find min and max, and should find all points
-
-	additionally it is worth using the given bundle to eliminate the need to
-	find both since we already have one of the two (under strict convexity/IDs)
-*/
-
 // define parameters and variables present in the optimization problem
 
 var m, u float64
@@ -30,7 +22,7 @@ func I(x1, utility float64) float64 {
 	return x2
 }
 
-// the rest of the functions are replacements for findIntersection
+// the rest of the functions are replacements for findIntersection()
 
 func difference(x1, income, utility float64) float64 {
 	return I(x1, utility) - B(x1, income)
@@ -71,19 +63,9 @@ func adjust(lx, ux float64) float64 {
 	return u
 }
 
-// close but nah, but still really close
-
-func main() {
-	// this is for the Marshallian case
-
-	m = 100
-
-	t[0], t[1] = .3, .7
-	p[0], p[1] = 3, 2
-
+func marshallianDemand(m float64, p, t [2]float64) [2]float64 {
 	u = math.Pow(.5*(m/p[0]), t[0]) * math.Pow(.5*(m/p[1]), t[1])
 
-	start := time.Now()
 	var bounds []float64
 	bounds = []float64{newtonsMethod(.001, u), newtonsMethod(m/p[0], u)}
 
@@ -93,7 +75,21 @@ func main() {
 		// fmt.Println(bounds)
 	}
 
-	bundle := []float64{bounds[0], B(bounds[0], m)}
+	return [2]float64{bounds[0], B(bounds[0], m)}
+}
+
+func main() {
+	// this is for the Marshallian case
+
+	m = 100
+
+	t[0], t[1] = .3, .7
+	p[0], p[1] = 3, 2
+
+	var bundle [2]float64
+
+	start := time.Now()
+	bundle = marshallianDemand(m, p, t)
 	elapsed := time.Since(start)
 
 	for i := 0; i < 2; i++ {

@@ -2,6 +2,8 @@ import math
 import time
 from tqdm import tqdm
 
+# n-dimensional case for the first draft
+
 
 # for when I do decide to take this case in n dimensions use these functions
 '''

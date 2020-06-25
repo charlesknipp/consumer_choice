@@ -2,8 +2,7 @@ import math
 import time
 
 
-# calculate the Lagrange Dual for a consumer choice problem with two goods
-# and Cobb-Douglas preferences
+# assuming differentiability, exploit the lagrange version via minimax
 
 def budget(x,p):
     return sum([x[i]*p[i] for i in range(len(x))])

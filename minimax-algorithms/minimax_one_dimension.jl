@@ -1,18 +1,6 @@
 using Plots
 using Printf
 
-"""
-# define some c ∈ C as a vector of goods
-c = Array{Float64}
-
-# define a composite object to help with aggregation on a hyperplane for when we
-# eventually consider the case of projective concavity
-struct Composite(i)
-    x = c[i]
-    y = c[1:end.!=i,:]
-end
-"""
-
 # normalized prices wrt x
 p = 1
 m = 20

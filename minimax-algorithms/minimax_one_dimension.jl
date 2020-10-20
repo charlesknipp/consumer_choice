@@ -23,7 +23,7 @@ Y = 0:.04:(m/p)
 
 
 # plot the values using the GR backend
-plot(surface(X,(0:.01:1),L,camera=(80,60)))
+plt = plot(surface(X,(0:.01:1),L,camera=(80,60),fillcolor=:viridis))
 
 # use single crossing definition to keep it discrete
 function isSupermodular(high::Tuple,low::Tuple)

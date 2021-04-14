@@ -1,14 +1,10 @@
 using Base.Iterators
-using Plots
 using LinearAlgebra
 
-# just use Cobb-Douglas because it is supermodular in c on C = {c|c∈Rⁿ,α≥0}
-α = [.5,.25,.25]
+# just use Cobb-Douglas because it is supermodular in x on X = {x|x∈Rⁿ,α≥0}
+α = [.3,.2,.1,.4]
 f(x) = reduce(*,x.^α)
 lagrange(x,λ) = f(x) + λ*(m-reduce(+,p.*x))
-
-# the lagrangian is in terms of a vector, should probably rethink how my data is
-# structured
 
 function constraintSet(p::Array,t::Float64,equality::Bool=false,δ::Int=2)
     feasible(x)  = sum(p.*x)-t ≤ 0 ? true : false
@@ -24,8 +20,9 @@ function constraintSet(p::Array,t::Float64,equality::Bool=false,δ::Int=2)
 end
 
 
-function lineSearch(Γ)
+function lineSearch(p::Array,t::Float64)
     global x_optimal
+    Γ = constraintSet(p,t)
     x_optimal = Γ[1]
     
     for x in Γ
@@ -38,11 +35,6 @@ function lineSearch(Γ)
     
     return x_optimal
 end
-
-# Γ1 = constraintSet([2.0,2.0,2.0],3.0,false)
-# Γ2 = constraintSet([2.0,2.0,2.0],3.0,true)
-
-# @time lineSearch(Γ1)
 
 # derive using the limit definition
 function subgradient(x::Vector,step::Float64)
@@ -82,11 +74,11 @@ function gradientAscent(p,t,δ,max_iters=1000)
     return round.(xₖ,digits=3)
 end
 
-# fucking finally!!!!!!
-# grad = subgradient([.5,.5,.5])
-# grad'*proj
-
 # Γ = constraintSet([2.0,2.0,2.0],3.0,false)
 # lineSearch(Γ)
 
-gradientAscent([2.0,2.0,2.0],3.0,20)
+p_test = [2.0,2.0,2.0,2.0]
+t_test = 3.0
+
+# @time sol1 = lineSearch(p_test,t_test)
+@time sol2 = gradientAscent(p_test,t_test,8)

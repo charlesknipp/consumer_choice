@@ -20,9 +20,9 @@ function constraintSet(p::Array,t::Float64,equality::Bool=false,δ::Int=2)
 end
 
 
-function lineSearch(p::Array,t::Float64)
+function lineSearch(p::Array,t::Float64,equality::Bool=true)
     global x_optimal
-    Γ = constraintSet(p,t)
+    Γ = constraintSet(p,t,equality)
     x_optimal = Γ[1]
     
     for x in Γ

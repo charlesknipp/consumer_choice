@@ -61,12 +61,8 @@ function gradientAscent(p,t,δ,max_iters=1000)
     n = length(p)
     ϵ = exp10(-δ)
 
-    global xₖ
-    x₀ = [t/(n*pᵢ) for pᵢ in p]
-    xₖ = x₀
-
-    global α
-    αₖ = 1
+    global xₖ = [t/(n*pᵢ) for pᵢ in p]
+    global αₖ = 1
 
     ∇f(x) = subgradient(x,.00000001)
     proj  = Matrix(1.0I,n,n) - p*inv(p'*p)*p'

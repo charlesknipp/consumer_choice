@@ -1,7 +1,7 @@
 using JuMP
 using Ipopt
 
-model = Model(Ipopt.Optimizer)
+model = Model(with_optimizer(Ipopt.Optimizer))
 @variable(model, x1 >= 0)
 @variable(model, x2 >= 0)
 @variable(model, x3 >= 0)

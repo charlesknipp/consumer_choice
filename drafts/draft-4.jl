@@ -3,8 +3,10 @@ using LinearAlgebra
 using BenchmarkTools
 
 # just use Cobb-Douglas because it is supermodular in x on X = {x|x∈Rⁿ,α≥0}
-α = [.3,.2,.5,.4]
+α = [.3,.2,.1,.4]
 f(x::Vector{Float64}) = reduce(*,x.^α)
+
+f(x::Vector{Float64}) = x[1]*(x[2]-1.0)^3 + x[1]
 
 # almost as inefficient as the binary search itself, but works really well
 function constraintSet(p::Vector{Float64},t::Float64,equality::Bool=false,δ::Int64=2)
@@ -94,7 +96,8 @@ function projectedGradientAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_i
     n = length(p)
     ϵ = exp10(-δ)
 
-    global xₖ = [t/(n*pᵢ) for pᵢ in p]
+    # global xₖ = [t/(n*pᵢ) for pᵢ in p]
+    global xₖ = [.05,t-.05]
     global xₖ_prev
 
     ∇f(x) = subgradient(x,ϵ)
@@ -104,22 +107,23 @@ function projectedGradientAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_i
         if k == 1
             αₖ = 1
         else
-            Δx, ΔDf = xₖ+xₖ_prev, ∇f(xₖ)+∇f(xₖ_prev)
+            Δx  = abs.(xₖ-xₖ_prev)
+            ΔDf = abs.(∇f(xₖ)-∇f(xₖ_prev))
             αₖ = (Δx⋅ΔDf)/(ΔDf⋅ΔDf)
         end
 
         xₖ_prev = xₖ
-        term = αₖ*(proj*∇f(xₖ_prev))
-        xₖ = xₖ_prev + term
+        Δxₖ = αₖ*(proj*∇f(xₖ_prev))
+        xₖ  = xₖ_prev + Δxₖ
 
-        abs(f(xₖ)-f(xₖ_prev)) ≤ ϵ ? break : continue
+        sqrt(dot(Δxₖ,Δxₖ)) ≤ ϵ ? break : continue
     end
 
     return round.(xₖ,digits=3)
 end
 
 # this operates on the lagrangian rather than the objective function
-function SQP(p::Vector{Float64},t::Float64,δ::Int64=8,max_iters::Int64=1000)
+function lagrangianAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_iters::Int64=10000)
     n = length(p)
     ϵ = exp10(-δ)
 
@@ -132,12 +136,12 @@ function SQP(p::Vector{Float64},t::Float64,δ::Int64=8,max_iters::Int64=1000)
 
     for k in 1:max_iters
         xₖ_prev = xₖ
-        dk = [Hf(xₖ) -p; -p' 0.0]\[(-∇f(xₖ)-λₖ*p)' p'*xₖ-t]'
-        Δx,Δλ = dk[1:n],dk[n+1]
-        xₖ = abs.(xₖ+Δx)
-        λₖ = abs(λₖ-Δλ)
+        ΔL = [Hf(xₖ) -p; -p' 0.0]\[(-∇f(xₖ)+λₖ*p)' p'*xₖ-t]'
+        Δx,Δλ = ΔL[1:n],ΔL[n+1]
+        xₖ = xₖ+Δx
+        λₖ = λₖ+Δλ
 
-        abs(f(xₖ)-f(xₖ_prev)) ≤ ϵ ? break : continue
+        sqrt(dot(ΔL,ΔL)) ≤ ϵ ? break : continue
     end
 
     return (round.(xₖ,digits=3),round(λₖ,digits=δ))
@@ -146,7 +150,10 @@ end
 # for benchmarking and comparing computational efficiency
 p_test4 = [2.0,2.0,2.0,2.0]
 p_test3 = [2.0,2.0,2.0]
+p_test2 = [1.0,1.0]
 t_test = 3.0
 
-@benchmark SQP(p_test4,t_test)
-# @benchmark projectedGradientAscent(p_test,t_test)
+# @benchmark lagrangianAscent(p_test2,t_test)
+@benchmark projectedGradientAscent(p_test2,t_test)
+
+# notice that αₖ at the final iteration is the lagrange multiplier!!

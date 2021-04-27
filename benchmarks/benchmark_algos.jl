@@ -16,6 +16,7 @@ function case1()
     @show value(x2)
     @show value(x3)
     @show value(x4)
+    @show dual(Γ)
 end
 
 function case2()

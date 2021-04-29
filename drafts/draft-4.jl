@@ -4,9 +4,10 @@ using BenchmarkTools
 
 # just use Cobb-Douglas because it is supermodular in x on X = {x|x∈Rⁿ,α≥0}
 α = [.3,.2,.1,.4]
+# α = [.3,.2,.5]
 f(x::Vector{Float64}) = reduce(*,x.^α)
 
-f(x::Vector{Float64}) = x[1]*(x[2]-1.0)^3 + x[1]
+# f(x::Vector{Float64}) = x[1]*(x[2]-1.0)^3 + x[1]
 
 # almost as inefficient as the binary search itself, but works really well
 function constraintSet(p::Vector{Float64},t::Float64,equality::Bool=false,δ::Int64=2)
@@ -96,8 +97,8 @@ function projectedGradientAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_i
     n = length(p)
     ϵ = exp10(-δ)
 
-    # global xₖ = [t/(n*pᵢ) for pᵢ in p]
-    global xₖ = [.05,t-.05]
+    global xₖ = [t/(n*pᵢ) for pᵢ in p]
+    # global xₖ = [.05,t-.05]
     global xₖ_prev
 
     ∇f(x) = subgradient(x,ϵ)
@@ -116,7 +117,7 @@ function projectedGradientAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_i
         Δxₖ = αₖ*(proj*∇f(xₖ_prev))
         xₖ  = xₖ_prev + Δxₖ
 
-        sqrt(dot(Δxₖ,Δxₖ)) ≤ ϵ ? break : continue
+        sqrt(dot(Δxₖ,Δxₖ)) ≤ .0001 ? break : continue
     end
 
     return round.(xₖ,digits=3)
@@ -135,13 +136,14 @@ function lagrangianAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_iters::I
     Hf(x) = hessian(x,.001)
 
     for k in 1:max_iters
+        println(xₖ)
         xₖ_prev = xₖ
         ΔL = [Hf(xₖ) -p; -p' 0.0]\[(-∇f(xₖ)+λₖ*p)' p'*xₖ-t]'
         Δx,Δλ = ΔL[1:n],ΔL[n+1]
-        xₖ = xₖ+Δx
+        xₖ = abs.(xₖ+Δx)
         λₖ = λₖ+Δλ
 
-        sqrt(dot(ΔL,ΔL)) ≤ ϵ ? break : continue
+        sqrt(dot(ΔL,ΔL)) ≤ .0001 ? break : continue
     end
 
     return (round.(xₖ,digits=3),round(λₖ,digits=δ))
@@ -153,7 +155,7 @@ p_test3 = [2.0,2.0,2.0]
 p_test2 = [1.0,1.0]
 t_test = 3.0
 
-# @benchmark lagrangianAscent(p_test2,t_test)
-@benchmark projectedGradientAscent(p_test2,t_test)
+# @benchmark lagrangianAscent(p_test3,t_test)
+# @benchmark projectedGradientAscent(p_test3,t_test)
 
 # notice that αₖ at the final iteration is the lagrange multiplier!!

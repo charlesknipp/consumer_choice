@@ -98,7 +98,6 @@ function projectedGradientAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_i
     ϵ = exp10(-δ)
 
     global xₖ = [t/(n*pᵢ) for pᵢ in p]
-    # global xₖ = [.05,t-.05]
     global xₖ_prev
 
     ∇f(x) = subgradient(x,ϵ)
@@ -136,12 +135,11 @@ function lagrangianAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_iters::I
     Hf(x) = hessian(x,.001)
 
     for k in 1:max_iters
-        println(xₖ)
         xₖ_prev = xₖ
         ΔL = [Hf(xₖ) -p; -p' 0.0]\[(-∇f(xₖ)+λₖ*p)' p'*xₖ-t]'
-        Δx,Δλ = ΔL[1:n],ΔL[n+1]
+        Δx, Δλ = ΔL[1:n], ΔL[n+1]
         xₖ = abs.(xₖ+Δx)
-        λₖ = λₖ+Δλ
+        λₖ = abs(λₖ+Δλ)
 
         sqrt(dot(ΔL,ΔL)) ≤ .0001 ? break : continue
     end

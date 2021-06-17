@@ -4,17 +4,17 @@ using BenchmarkTools
 using Plots
 
 # Cobb-Douglas with weights α
-α = [.3,.7]
+α = [.3,.2,.1,.4]
 f(x::Vector{Float64}) = reduce(*,x.^α)
 
 # quasilinear
-# f(x::Vector{Float64}) = x[1]^.5 + x[2]
+f(x::Vector{Float64}) = x[1]^.5 + x[2]
 
 # perfect complements
-# f(x::Vector{Float64}) = min(x[1]/2,x[2])
+f(x::Vector{Float64}) = min(x[1],x[2])
 
 # almost as inefficient as the binary search itself, but works really well
-function constraintSet(p::Vector{Float64},t::Float64,equality::Bool=false,δ::Int64=3)
+function constraintSet(p::Vector{Float64},t::Float64,equality::Bool=false,δ::Int64=2)
     feasible(x)  = sum(p.*x)-t ≤ 0 ? true : false
     efficient(x) = abs(sum(p.*x)-t) ≤ exp10(-δ) ? true : false
 
@@ -28,7 +28,7 @@ function constraintSet(p::Vector{Float64},t::Float64,equality::Bool=false,δ::In
 end
 
 # the literal worst algorithm epsecially in higher dimensions with dense spaces
-function binarySearch(p::Vector{Float64},t::Float64,equality::Bool=false)
+function binarySearch(p::Vector{Float64},t::Float64,equality::Bool=true)
     global x_optimal
     Γ = constraintSet(p,t,equality)
     x_optimal = Γ[1]
@@ -38,7 +38,7 @@ function binarySearch(p::Vector{Float64},t::Float64,equality::Bool=false)
             x_optimal = x
         end
     end
-    println(length(Γ))
+    
     return x_optimal
 end
 
@@ -109,7 +109,6 @@ function projectedGradientAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_i
     global xₖ = [t/(n*pᵢ) for pᵢ in p]
     global xₖ_prev
 
-    path = xₖ
     ∇f(x) = subgradient(x,ϵ)
     proj  = Matrix(1.0I,n,n) - p*inv(p'*p)*p'
 
@@ -117,28 +116,19 @@ function projectedGradientAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_i
         if k == 1
             αₖ = 1
         else
-            Δx  = xₖ-xₖ_prev
-            ΔDf = ∇f(xₖ)-∇f(xₖ_prev)
-            αₖ = abs((Δx⋅ΔDf))/(ΔDf⋅ΔDf)
-            # println(αₖ)
+            Δx  = abs.(xₖ-xₖ_prev)
+            ΔDf = abs.(∇f(xₖ)-∇f(xₖ_prev))
+            αₖ = (Δx⋅ΔDf)/(ΔDf⋅ΔDf)
         end
 
         xₖ_prev = xₖ
         Δxₖ = αₖ*(proj*∇f(xₖ_prev))
         xₖ  = xₖ_prev + Δxₖ
-
-        if sum(x->x>=0, xₖ) != n
-            xₖ = xₖ_prev + .5*(proj*∇f(xₖ_prev))
-        end
-
-        path = hcat(path,xₖ)
-        # println(k)
         
         sqrt(dot(Δxₖ,Δxₖ)) ≤ .0001 ? break : continue
     end
 
-    # return path',round.(xₖ,digits=3)
-    return xₖ
+    return round.(xₖ,digits=3)
 end
 
 # this operates on the lagrangian rather than the objective function
@@ -150,7 +140,6 @@ function lagrangianAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_iters::I
     global λₖ = 1.0
     global xₖ_prev
 
-    path = xₖ
     ∇f(x) = subgradient(x,ϵ)
     Hf(x) = hessian(x,.001)
 
@@ -160,16 +149,11 @@ function lagrangianAscent(p::Vector{Float64},t::Float64,δ::Int64=8,max_iters::I
         Δx, Δλ = ΔL[1:n], ΔL[n+1]
         xₖ = abs.(xₖ+Δx)
         λₖ = λₖ+Δλ
-        
-        # print(k)
-        path = hcat(path,xₖ)
 
         sqrt(dot(ΔL,ΔL)) ≤ .0001 ? break : continue
     end
 
-    # return (round.(xₖ,digits=3),round(λₖ,digits=δ))
-    # return (xₖ,λₖ)
-    return xₖ
+    return (round.(xₖ,digits=3),round(λₖ,digits=δ))
 end
 
 # for benchmarking and comparing computational efficiency
@@ -178,14 +162,7 @@ p_test3 = [2.0,2.0,2.0]
 p_test2 = [1.0,1.0]
 t_test = 3.0
 
-# @benchmark binarySearch(p_test2,t_test)
 # @benchmark lagrangianAscent(p_test2,t_test)
 # @benchmark projectedGradientAscent(p_test2,t_test)
 
-"""
-p,x_optimal = projectedGradientAscent(p_test2,t_test)
-plot([0,3],[3,0])
-scatter!(p[:,1],p[:,2])
-"""
-
-println(projectedGradientAscent(p_test2,4.0))
+lagrangianAscent(p_test2,t_test)

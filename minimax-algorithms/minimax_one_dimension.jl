@@ -30,7 +30,7 @@ function isSupermodular(high::Tuple,low::Tuple)
     x_l,y_l = low
     x_h,y_h = high
 
-    sm = u(x_h,y_h)-u(x_l,y_h) >= u(x_h,y_l)-u(x_l,y_l) ?  true : false
+    sm = u(x_h,y_h)-u(x_l,y_h) >= u(x_h,y_l)-u(x_l,y_l) ? true : false
     return sm
 end
 
